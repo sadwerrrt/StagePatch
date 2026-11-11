@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#5b5bf0"><link rel="icon" href="icons/icon-192.png"><title>StagePatch – Free Song Patch Player</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#f4f5f9;--card:#fff;--tx:#1b1d2a;--mut:#666b80;--bd:#d9dce8;--ac:#5b5bf0;--k:#fff;--kb:#20222e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12131a;--card:#1d1f2b;--tx:#eceef7;--mut:#9aa0b8;--bd:#2f3243;--ac:#8484ff;--k:#e9ebf5;--kb:#0b0c11}}
+:root[data-theme="dark"]{--bg:#12131a;--card:#1d1f2b;--tx:#eceef7;--mut:#9aa0b8;--bd:#2f3243;--ac:#8484ff;--k:#e9ebf5;--kb:#0b0c11}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:900px;margin:0 auto;padding:12px}
+h1{font-size:20px;margin:0}h2{font-size:15px;margin:0 0 8px;color:var(--mut);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+button,select,input[type=text]{font:inherit;color:var(--tx);background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:10px 12px;min-height:44px}
+button{cursor:pointer}button.pri{background:var(--ac);color:#fff;border-color:var(--ac);font-weight:600}
+.secs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sec{padding:16px 6px;font-weight:700;font-size:15px;border-width:2px;text-align:center}
+.sec.on{color:#fff;border-color:transparent}
+.layer{border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px}
+.layer.mute{opacity:.5}
+.fader{flex:1;min-width:140px}.fader label{display:block;font-size:13px;color:var(--mut)}
+input[type=range]{width:100%;height:36px;accent-color:var(--ac)}
+.pill{font-size:13px;color:var(--mut)}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#aaa;margin-right:6px}.dot.ok{background:#2fb86b}
+#kbd{position:relative;height:150px;display:flex;overflow-x:auto;touch-action:pan-x;user-select:none;-webkit-user-select:none;border-radius:10px}
+.wk{flex:0 0 46px;height:100%;background:var(--k);border:1px solid #888;border-radius:0 0 6px 6px;position:relative;touch-action:none}
+.wk.d{background:var(--ac)}
+.bk{position:absolute;left:32px;top:0;width:28px;height:90px;background:var(--kb);border-radius:0 0 4px 4px;z-index:2;touch-action:none}
+.bk.d{background:var(--ac)}
+.help{font-size:14px;color:var(--mut)}.help li{margin-bottom:4px}
+#start{position:fixed;inset:0;background:rgba(10,10,20,.85);display:flex;align-items:center;justify-content:center;z-index:9;padding:20px}
+#start div{background:var(--card);padding:24px;border-radius:16px;max-width:380px;text-align:center}
+.x{border:none;background:none;color:#d33;font-size:20px;min-height:44px}
+.view{display:none}.view.on{display:block}body{padding-bottom:84px}
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+#nav button{flex:1;border:none;border-radius:0;background:none;padding:6px 2px;font-size:12px;min-height:56px}#nav button b{display:block;font-size:22px;font-weight:400}#nav button.on{color:var(--ac);font-weight:700}
+.hero{text-align:center;padding:24px 8px}.hero .logo{font-size:64px}.big{display:block;width:100%;margin:10px 0;padding:18px;font-size:18px;text-align:left}
+details{border:1px solid var(--bd);border-radius:12px;padding:4px 12px;margin-bottom:8px;background:var(--card)}summary{font-weight:700;padding:10px 0;cursor:pointer;min-height:44px}details p,details li{font-size:15px}details ol,details ul{padding-left:20px}
+.tw{background:var(--bg);border-radius:10px;padding:8px;margin-top:6px}
+</style></head><body>
+<div id="start"><div><h1>🎹 StagePatch</h1><p>Free keyboard sounds in your browser. Build songs with sections, layer sounds, and play with your MIDI keyboard.</p><button class="pri" id="go" style="width:100%">Tap to start</button></div></div>
+<div class="wrap">
+<div class="row" style="justify-content:space-between;margin-bottom:10px"><h1>🎹 StagePatch</h1><span class="pill"><span id="dot" class="dot"></span><span id="mstat">No MIDI</span></span></div>
+
+<nav id='nav'><button data-go='home' class='on'><b>🏠</b>Home</button><button data-go='play'><b>🎹</b>Play</button><button data-go='help'><b>📖</b>Help guide</button></nav>
+<div class='view on' id='v-home'><div class='hero'><div class='logo'>🎹</div><h1 style='font-size:30px'>StagePatch</h1><p class='help'>Free keyboard sounds and song patches for your phone or laptop.</p></div>
+<button class='big pri' data-go='play'>▶  Start playing</button>
+<button class='big' data-go='help' data-h='h-connect'>🔌  How to connect my keyboard</button>
+<button class='big' data-go='help' data-h='h-patch'>🎼  How to build a song patch</button>
+<button class='big' data-go='help' data-h='h-tweak'>🎛  How to shape a sound</button>
+<button class='big' data-go='help' data-h='h-save'>💾  How to save my songs</button>
+<p class='help' style='text-align:center'>100 free sounds · 6 song sections · MIDI keyboard ready</p></div>
+<div class='view' id='v-help'><h1 style='margin:4px 0 12px'>Help guide</h1>
+<details id='h-need'><summary>1 · What you need</summary><ul><li>A keyboard with a <b>USB</b> port (or an older 5‑pin MIDI keyboard plus a MIDI‑to‑USB adapter).</li><li>The cable: a standard <b>USB‑A to USB‑B</b> cable, the same square-ended type many printers use.</li><li>A laptop, or an Android phone with a <b>USB‑OTG adapter</b> (USB‑C or micro‑USB to USB‑A female).</li><li>Chrome, Edge or Opera. iPhone and iPad Safari can’t receive MIDI in web pages, but the on‑screen keys still work.</li></ul></details>
+<details id='h-connect'><summary>2 · Connect the keyboard</summary><p><b>Laptop:</b></p><ol><li>Switch the keyboard on and plug the USB‑B end into the keyboard, the other end into the laptop.</li><li>Open StagePatch in Chrome or Edge and go to <b>Play</b>.</li><li>Press <b>Connect MIDI keyboard</b> and choose <b>Allow</b>.</li><li>The dot at the top turns green and says how many devices are connected. Press a key: you should hear sound.</li></ol><p><b>Android phone:</b></p><ol><li>Plug the OTG adapter into the phone, then the USB cable from the adapter to the keyboard.</li><li>Open StagePatch in Chrome, press <b>Connect MIDI keyboard</b> and Allow.</li><li>If the phone asks what to do with the USB device, choose to use it for MIDI or just dismiss it.</li></ol><p><b>Older 5‑pin MIDI keyboards:</b> plug a MIDI‑to‑USB interface into the keyboard’s <b>MIDI OUT</b> port, then connect it to the phone or laptop as above.</p><p>If you have several devices, pick your keyboard in the list next to the Connect button, or leave it on <i>All MIDI inputs</i>.</p></details>
+<details id='h-patch'><summary>3 · Build a song patch</summary><p>A <b>song</b> is a set of six <b>sections</b>. Each section has its own <b>patch</b>: one or more sounds layered together.</p><ol><li>Go to <b>Play</b>. Under <b>Song</b>, press <b>+ New</b> and type a name.</li><li>Tap a section button, for example <b>Intro</b>.</li><li>Under <b>Sounds in this section</b>, choose a sound from the list (10 each of piano, electric piano, organ, strings, pad, brass, lead, bass, pluck and bells).</li><li>Press <b>+ Add another sound</b> to layer more, for example piano plus strings.</li><li>Use each sound’s <b>Volume</b> slider to balance them. <b>−8va / +8va</b> moves a sound one octave down or up.</li><li><b>Plays on</b> lets you split the keyboard: put a bass on the <b>Left half only</b> and a piano on the <b>Right half only</b>. The split is at middle C.</li><li>The <b>🔊 On</b> button mutes a sound without deleting it. <b>✕</b> removes it.</li><li>Move to the next section and repeat. <b>Copy from previous section</b> is a quick starting point.</li><li>Test by playing keys, and tap sections to switch like you would on stage.</li></ol></details>
+<details id='h-sections'><summary>4 · What each section is for</summary><ul><li><b>Intro:</b> the opening. Try a soft pad or piano.</li><li><b>Verse:</b> the storytelling part. Keep it simple, such as piano or electric piano.</li><li><b>Pre-Chorus:</b> builds energy. Add strings and a little more volume.</li><li><b>Chorus:</b> the big part. Layer piano, strings and a bass on the left half.</li><li><b>Instrumental:</b> the solo break. A synth lead, brass or bells work well.</li><li><b>Bridge:</b> a change of mood. Try organ with a warm pad.</li></ul><p>These are only ideas. Every section can use any sounds.</p></details>
+<details id='h-tweak'><summary>5 · Shape a sound (attack, release, cutoff)</summary><p>Under any sound, press <b>🎛 Tweak this sound</b>. Move a slider, then play a key to hear it. A dot ● on the button means that sound has been changed. <b>Back to original sound</b> undoes it.</p><ul><li><b>Attack:</b> how slowly the note fades in. Low is instant (piano), high is a slow swell (strings, pads).</li><li><b>Decay:</b> how fast the note dips after the first hit.</li><li><b>Sustain:</b> how loud the note stays while you hold the key. Low makes plucky sounds, high makes organ-like sounds.</li><li><b>Release:</b> how long the sound rings after you let go. High gives a long tail.</li><li><b>Cutoff:</b> low is soft and dark, high is bright and sharp.</li><li><b>Resonance:</b> adds a ringing, whistling edge around the cutoff. Keep it low for a natural sound.</li></ul><p>Settings are saved separately for each sound in each section.</p></details>
+<details id='h-live'><summary>6 · Playing live</summary><ul><li>Tap a section button to switch patches. On a laptop you can also press <b>1–6</b>.</li><li>Your keyboard’s <b>Program Change</b> buttons 1–6 also switch the sections, and a sustain pedal works.</li><li><b>Master volume</b> and <b>Room / echo</b> are under <b>Overall</b>. <b>Stop all</b> clears any stuck note.</li></ul></details>
+<details id='h-save'><summary>7 · Save and load your songs</summary><ul><li>Your songs are kept on this device automatically.</li><li>For a backup file, go to <b>Play</b>, scroll to <b>Save &amp; load songs</b> and press <b>Save this song to a file</b> (or <b>Save all songs</b>). Confirm the download.</li><li>To bring songs back, or move them to another phone or laptop, press <b>Load a song file</b> and pick the file. The songs are added to your list.</li></ul></details>
+<details id='h-trouble'><summary>8 · Troubleshooting</summary><ul><li><b>No sound:</b> turn up the phone or laptop volume and the Master volume, and tap the screen once so the browser lets the page play audio.</li><li><b>Keyboard not found:</b> check the cable, switch the keyboard on, press Connect again, and use Chrome or Edge. Some keyboards need to be set to USB MIDI mode.</li><li><b>Stuck note:</b> press <b>Stop all</b>.</li><li><b>Delay:</b> close other apps and use a wired connection, not Bluetooth headphones.</li></ul></details></div>
+<div id='v-play' class='view'><div class="card"><h2>1 · Connect keyboard</h2>
+<div class="row"><button class="pri" id="conn">Connect MIDI keyboard</button><select id="dev" style="flex:1;min-width:160px"><option value="all">All MIDI inputs</option></select></div>
+<p class="help" style="margin:8px 0 0">No keyboard? Use the on-screen keys below, or your computer keys (A–L = white, W E T Y U = black).</p></div>
+
+<div class="card"><h2>2 · Song</h2>
+<div class="row"><select id="song" style="flex:1;min-width:160px"></select><button id="ns">+ New</button><button id="rn">Rename</button><button id="ds">Delete</button></div></div>
+
+<div class="card"><h2>Save &amp; load songs</h2><div class="row"><button class="pri" id="sv1">💾 Save this song to a file</button><button id="svall">Save all songs</button><button id="ld">📂 Load a song file</button></div><input type="file" id="file" accept=".json,application/json" hidden><div id="boxw" hidden style="margin-top:8px"><p class="help">Copy this text into a file named song.json. To load, paste saved text here and press the button.</p><textarea id="box" rows="5" style="width:100%;font:12px monospace;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-radius:10px"></textarea><button id="pl">Load from pasted text</button></div></div>
+<div class="card"><h2>3 · Tap a section to play it</h2><div class="secs" id="secs"></div>
+<p class="help" style="margin:8px 0 0">Tip: your keyboard’s Program Change buttons 1–6 also switch sections.</p></div>
+
+<div class="card"><h2>4 · Sounds in this section</h2><div id="layers"></div>
+<div class="row"><button id="add">+ Add another sound</button><button id="copy">Copy from previous section</button></div></div>
+
+<div class="card"><h2>Overall</h2><div class="row">
+<div class="fader"><label>Master volume</label><input type="range" id="mv" min="0" max="100" value="80"></div>
+<div class="fader"><label>Room / echo</label><input type="range" id="rv" min="0" max="100" value="25"></div>
+<button id="panic">Stop all</button></div></div>
+
+<div class="card"><div class="row" style="margin-bottom:8px"><h2 style="margin:0">Keys</h2><button id="ou">View octave ▶</button><button id="od">◀ View octave</button></div><div id="kbd"></div></div>
+
+</div><div class="card" hidden><h2>How to connect</h2><ul class="help">
+<li><b>Laptop (Chrome, Edge or Opera):</b> plug the keyboard in with its USB cable (the “printer” type USB‑B cable, or a MIDI‑to‑USB adapter), press <i>Connect MIDI keyboard</i> and allow access.</li>
+<li><b>Android phone (Chrome):</b> use a USB‑OTG adapter + the same cable.</li>
+<li><b>iPhone/iPad:</b> Safari doesn’t support MIDI in web pages, so use the on‑screen keys or a MIDI‑capable browser app.</li>
+<li>Everything is free; all sounds are generated live, no downloads. Songs also save on this device automatically; use “Save this song to a file” to keep a backup or move it to another device, then “Load a song file” to bring it back.</li></ul></div>
+</div>
+<script>
+const OLD0={
+piano:{n:"Grand Piano",o:[["triangle",1,1],["sine",2,.35],["sine",3,.15]],a:.004,d:1.4,s:.12,r:.35,f:4500},
+epiano:{n:"Electric Piano",o:[["sine",1,1],["sine",2,.25],["sine",14,.06]],a:.004,d:1.6,s:.25,r:.3,f:5000},
+organ:{n:"Church Organ",o:[["sine",1,1],["sine",2,.6],["sine",3,.4],["sine",4,.3]],a:.015,d:.1,s:1,r:.08,f:6000},
+strings:{n:"Strings",o:[["sawtooth",1,1,-8],["sawtooth",1,1,8]],a:.45,d:.3,s:.85,r:.7,f:1800},
+pad:{n:"Warm Pad",o:[["sine",1,1],["triangle",1,.7,6],["triangle",2,.2,-6]],a:.9,d:.5,s:.8,r:1.3,f:2500},
+brass:{n:"Brass",o:[["sawtooth",1,1],["sawtooth",1,.6,5]],a:.07,d:.2,s:.8,r:.15,f:1600},
+lead:{n:"Synth Lead",o:[["square",1,.7],["sawtooth",1,.5,7]],a:.01,d:.2,s:.7,r:.15,f:3200},
+bass:{n:"Deep Bass",o:[["sawtooth",1,.7],["sine",.5,1]],a:.005,d:.35,s:.5,r:.12,f:700},
+pluck:{n:"Pluck",o:[["sawtooth",1,1],["square",2,.3]],a:.003,d:.35,s:.02,r:.2,f:2600},
+bell:{n:"Bells",o:[["sine",1,1],["sine",2.76,.4],["sine",5.4,.2]],a:.003,d:2.5,s:0,r:.8,f:9000}
+};
+const SOUNDS={},CATS={};
+function mk(k,name,b,vs){CATS[k]=name;vs.forEach((v,i)=>{SOUNDS[k+i]=Object.assign({n:v[0],c:k},b,v[1])})}
+const S1=(f,m=1,g=1,d)=>["sine",m,g,d],T="triangle",W="sawtooth",Q="square";
+mk("piano","Grand Piano",{o:[[T,1,1],["sine",2,.35],["sine",3,.15]],a:.004,d:1.4,s:.12,r:.35,f:4500},[
+["Concert Grand",{}],["Bright Grand",{f:8000,o:[[T,1,1],["sine",2,.5],["sine",4,.25]]}],["Mellow Grand",{f:1800,d:1.8}],["Upright Piano",{f:2800,d:.9,s:.05}],["Honky-Tonk",{o:[[T,1,1],[T,1,.8,12]],f:3500}],["Felt Piano",{f:1200,a:.02,r:.5}],["Studio Piano",{f:6000,d:1,s:.2}],["Ballad Piano",{f:3000,d:2.2,s:.25,r:.6}],["Cathedral Grand",{d:2.5,s:.3,r:1}],["Toy Piano",{o:[[Q,2,.6],["sine",4,.4]],f:6000,d:.5,s:0}]]);
+mk("epiano","Electric Piano",{o:[["sine",1,1],["sine",2,.25],["sine",14,.06]],a:.004,d:1.6,s:.25,r:.3,f:5000},[
+["Classic Rhodes",{}],["Bright Tine",{o:[["sine",1,1],["sine",14,.2]],f:8000}],["Soft Wurly",{o:[[T,1,1],["sine",2,.2]],f:2200}],["Chorus EP",{o:[["sine",1,1,-6],["sine",1,1,6],["sine",14,.05]]}],["Vintage Tine",{d:2.5,s:.1}],["Dyno EP",{o:[["sine",1,1],["sine",3,.3],["sine",7,.1]]}],["Clav EP",{o:[[W,1,.8],[Q,2,.3]],f:3000,d:.3,s:.1}],["Dreamy EP",{a:.05,d:2,s:.4,r:.8,f:2500}],["Stage 73",{f:3800,d:1.2}],["Glass EP",{o:[["sine",1,1],["sine",5,.3],["sine",9,.15]],f:9000}]]);
+mk("organ","Church Organ",{o:[["sine",1,1],["sine",2,.6],["sine",3,.4],["sine",4,.3]],a:.015,d:.1,s:1,r:.08,f:6000},[
+["Church Organ",{}],["Full Drawbars",{o:[["sine",.5,.8],["sine",1,1],["sine",2,.8],["sine",3,.6],["sine",4,.5]]}],["Jazz Organ",{o:[["sine",1,1],["sine",3,.6]],a:.005}],["Rock Organ",{o:[[W,1,.6],["sine",2,.6],["sine",3,.4]],f:3500}],["Pipe Organ",{o:[["sine",.5,.8],["sine",1,1],["sine",2,.7],["sine",4,.4]],a:.04,r:.3,f:3000}],["Flute Pipes",{o:[["sine",1,1],["sine",2,.1]],a:.06}],["Reed Organ",{o:[[Q,1,.5],["sine",2,.5]],f:2200}],["Gospel Organ",{o:[["sine",1,1],["sine",2,.7],["sine",3,.5],["sine",6,.4]],f:7000}],["Positive Organ",{o:[[T,1,1],["sine",2,.5],["sine",4,.3]],a:.02,r:.12,f:3000}],["Theatre Organ",{o:[["sine",1,1],["sine",1,.8,10],["sine",2,.5]],r:.2}]]);
+mk("strings","Strings",{o:[[W,1,1,-8],[W,1,1,8]],a:.45,d:.3,s:.85,r:.7,f:1800},[
+["String Section",{}],["Slow Strings",{a:.9,r:1.2,f:1400}],["Staccato Strings",{a:.01,d:.2,s:.1,r:.15,f:2800}],["Violins",{o:[[W,1,1,-5],[W,1,1,5],[W,2,.3]],f:2800,a:.25}],["Cellos",{o:[[W,1,1,-6],[W,1,1,6]],f:900,a:.3}],["Ensemble",{o:[[W,1,1,-12],[W,1,1,12],[T,1,.5]],f:2200,a:.6}],["Quick Swell",{a:.15,d:.15,s:.6,f:2000}],["Cinematic Strings",{a:1.2,r:1.8,f:2200}],["Chamber Strings",{a:.2,f:1600,r:.4}],["Synth Strings",{o:[[W,1,1,-15],[W,1,1,0],[W,1,1,15]],f:3000,a:.2}]]);
+mk("pad","Warm Pad",{o:[["sine",1,1],[T,1,.7,6],[T,2,.2,-6]],a:.9,d:.5,s:.8,r:1.3,f:2500},[
+["Warm Pad",{}],["Glass Pad",{o:[["sine",1,1],["sine",2,.5],["sine",3,.3]],f:6000}],["Dark Pad",{f:900,a:1.2}],["Air Pad",{o:[[T,1,1],["sine",2,.6]],a:1.2,r:2,f:4000}],["Choir Pad",{o:[["sine",1,1],[T,2,.5,5],["sine",3,.3]],a:.6,f:2000}],["Space Pad",{o:[[T,1,1,-15],[T,1,1,15]],a:1.5,r:2.5,f:3000}],["Soft Swell",{a:1.8,s:.9}],["Shimmer Pad",{o:[["sine",1,1],["sine",2,.6],["sine",4,.3]],a:.7,f:8000}],["Ambient Wash",{a:2,d:1,s:.7,r:3,f:2000}],["Analog Pad",{o:[[W,1,1,-10],[W,1,1,10],["sine",.5,.6]],f:1500,a:.5}]]);
+mk("brass","Brass",{o:[[W,1,1],[W,1,.6,5]],a:.07,d:.2,s:.8,r:.15,f:1600},[
+["Brass Section",{}],["Trumpet",{o:[[W,1,1],[Q,1,.3]],f:2800,a:.04}],["Trombone",{f:1000,a:.1}],["French Horn",{f:900,a:.15,r:.3}],["Bright Stabs",{a:.01,d:.15,s:.3,f:3500,r:.1}],["Soft Brass",{f:1100,a:.12}],["Synth Brass",{o:[[W,1,1,-10],[W,1,1,10],[W,.5,.4]],f:2400}],["Fanfare",{a:.03,f:3200,s:.9}],["Muted Trumpet",{o:[[Q,1,.5],[W,1,.4]],f:1800}],["Jazz Horns",{f:1500,a:.05,d:.4,s:.6}]]);
+mk("lead","Synth Lead",{o:[[Q,1,.7],[W,1,.5,7]],a:.01,d:.2,s:.7,r:.15,f:3200},[
+["Classic Lead",{}],["Soft Sine Lead",{o:[["sine",1,1],["sine",2,.15]],f:5000}],["Saw Lead",{o:[[W,1,1],[W,1,.8,9]],f:3500}],["Square Lead",{o:[[Q,1,1]]}],["Fat Lead",{o:[[W,1,1,-12],[W,1,1,12],[Q,.5,.5]],f:3000}],["Pluck Lead",{a:.005,d:.3,s:.2}],["Flute Lead",{o:[["sine",1,1],[T,2,.1]],a:.06,f:3000}],["Whistle",{o:[["sine",2,1]],a:.05}],["Sync Lead",{o:[[W,1,1],[W,1.5,.5]],f:4500}],["Retro Lead",{o:[[Q,1,.6],[Q,2,.3,5]],f:2500}]]);
+mk("bass","Deep Bass",{o:[[W,1,.7],["sine",.5,1]],a:.005,d:.35,s:.5,r:.12,f:700},[
+["Deep Bass",{}],["Sub Bass",{o:[["sine",1,1]],f:300}],["Finger Bass",{o:[[T,1,1],["sine",2,.3]],f:900,d:.5,s:.3}],["Synth Bass",{o:[[W,1,1],[Q,.5,.6]],f:1200,d:.2}],["Moog Bass",{o:[[W,1,1],[W,.5,1]],f:500}],["Slap Bass",{o:[[Q,1,.6],[W,2,.3]],f:2200,d:.12,s:.1}],["Fretless",{o:[[T,1,1],["sine",2,.4]],a:.02,f:700}],["Acoustic Bass",{o:[[T,1,1],["sine",2,.2]],a:.01,d:.6,s:.15,f:600}],["Growl Bass",{o:[[W,1,1],[W,1,.7,10]],f:900}],["Pulse Bass",{o:[[Q,1,1],[Q,.5,.5]],f:800,d:.25,s:.4}]]);
+mk("pluck","Pluck",{o:[[W,1,1],[Q,2,.3]],a:.003,d:.35,s:.02,r:.2,f:2600},[
+["Pluck",{}],["Harp",{o:[[T,1,1],["sine",2,.3],["sine",3,.1]],d:1.2,f:5000}],["Guitar Pluck",{o:[[W,1,1],[T,2,.3]],f:2000,d:.6}],["Kalimba",{o:[["sine",1,1],["sine",5.4,.3]],d:.9,f:6000}],["Pizzicato",{d:.15,f:2200}],["Marimba",{o:[["sine",1,1],["sine",4,.4]],d:.5}],["Koto",{o:[[W,1,1],[T,2,.4]],f:3500,d:.8}],["Banjo",{o:[[Q,1,1],[W,2,.5]],f:3500,d:.3}],["Synth Pluck",{o:[[W,1,1,-8],[W,1,1,8]],f:3500,d:.25}],["Harpsichord",{o:[[Q,1,.6],[W,2,.5]],f:5000,d:.5,s:0,r:.1}]]);
+mk("bell","Bells",{o:[["sine",1,1],["sine",2.76,.4],["sine",5.4,.2]],a:.003,d:2.5,s:0,r:.8,f:9000},[
+["Bells",{}],["Glockenspiel",{o:[["sine",1,1],["sine",4,.5],["sine",8,.2]],d:1.5,f:12000}],["Music Box",{o:[["sine",1,1],["sine",3,.3],["sine",6,.15]],d:1.2}],["Tubular Bells",{o:[["sine",1,1],["sine",2.76,.6],["sine",5.4,.4],["sine",8.9,.2]],d:3.5}],["Vibraphone",{o:[["sine",1,1],["sine",4,.2]],d:2.2}],["Crystal",{o:[["sine",1,1],["sine",3.9,.4],["sine",6.2,.3]],d:2.8,f:12000}],["Chime",{o:[["sine",1,1],["sine",2.4,.4]],d:3,r:1.2}],["Celesta",{o:[["sine",1,1],["sine",4,.3]],d:1.4}],["Church Bell",{o:[["sine",1,1],["sine",2.4,.7],["sine",3,.4],["sine",4.5,.3]],d:4}],["Dream Bells",{a:.1,d:3,r:2}]]);
+function soundOpts(cur){return Object.keys(CATS).map(c=>'<optgroup label="'+CATS[c]+'">'+Object.keys(SOUNDS).filter(k=>SOUNDS[k].c===c).map(k=>'<option value="'+k+'"'+(k===cur?" selected":"")+">"+SOUNDS[k].n+"</option>").join("")+"</optgroup>").join("")}
+function ct(t){if(!t||typeof t!=="object")return undefined;const o={};[["a",0,3],["d",.01,4],["s",0,1],["r",.01,4],["f",100,16000],["q",.1,20]].forEach(([k,lo,hi])=>{if(t[k]!=null&&isFinite(+t[k]))o[k]=Math.max(lo,Math.min(hi,+t[k]))});return Object.keys(o).length?o:undefined}
+function clean(a){if(!Array.isArray(a))return null;const out=[];a.forEach(s=>{if(!s||typeof s.name!=="string"||!Array.isArray(s.p))return;const p=[];for(let i=0;i<6;i++){const ls=Array.isArray(s.p[i])?s.p[i].filter(Boolean):[];p.push(ls.slice(0,8).map(l=>{let k=String(l.s);if(!SOUNDS[k])k=SOUNDS[k+"0"]?k+"0":"piano0";return{s:k,v:Math.max(0,Math.min(100,l.v==null?80:+l.v||0)),oct:Math.max(-2,Math.min(2,Math.round(+l.oct||0))),z:["all","low","high"].includes(l.z)?l.z:"all",m:!!l.m,t:ct(l.t)}}))}out.push({name:s.name.slice(0,60),p})});return out.length?out:null}
+const SECS=["Intro","Verse","Pre-Chorus","Chorus","Instrumental","Bridge"];
+const COL=["#e0568a","#2e9bd6","#e49a1f","#d9473d","#2fa86b","#8a5cd6"];
+const L=(s,v=80,oct=0,z="all")=>({s:s+"0",v,oct,z,m:false});
+function defSong(name){return{name,p:[[L("pad",70)],[L("piano")],[L("epiano",75),L("strings",50)],[L("piano"),L("strings",60),L("bass",70,-1,"low")],[L("lead",70)],[L("organ",65),L("pad",50)]]}}
+let songs=[defSong("My First Song")],cur=0,sec=0;
+try{const j=JSON.parse(localStorage.getItem("sp1"));if(j&&j.songs&&j.songs.length){songs=clean(j.songs)||songs;cur=Math.min(j.cur||0,songs.length-1)}}catch(e){}
+function save(){try{localStorage.setItem("sp1",JSON.stringify({songs,cur}))}catch(e){}}
+const $=id=>document.getElementById(id);
+let ac,master,dry,wet,held={},sus=new Set(),pedal=false,viewOct=3;
+function initAudio(){if(ac)return;ac=new (window.AudioContext||window.webkitAudioContext)();master=ac.createGain();dry=ac.createGain();wet=ac.createGain();
+const cv=ac.createConvolver(),n=ac.sampleRate*1.8,b=ac.createBuffer(2,n,ac.sampleRate);
+for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,2.5)}
+cv.buffer=b;const comp=ac.createDynamicsCompressor();
+dry.connect(master);wet.connect(cv);cv.connect(master);master.connect(comp);comp.connect(ac.destination);setVol()}
+function setVol(){if(!ac)return;master.gain.value=$("mv").value/100;const r=$("rv").value/100;wet.gain.value=r*.8;dry.gain.value=1-r*.3}
+function voice(sd0,note,vel,lv,tw){const sd=tw?Object.assign({},sd0,tw):sd0;const t=ac.currentTime,fr=440*Math.pow(2,(note-69)/12),env=ac.createGain(),fl=ac.createBiquadFilter();
+fl.type="lowpass";fl.Q.value=sd.q||.7;fl.frequency.value=Math.min(sd.f+fr*2,16000);const tot=sd.o.reduce((a,x)=>a+x[2],0),pk=.35*vel*lv;
+const os=sd.o.map(x=>{const o=ac.createOscillator(),g=ac.createGain();o.type=x[0];o.frequency.value=fr*x[1];o.detune.value=x[3]||0;g.gain.value=x[2]/tot;o.connect(g);g.connect(fl);o.start(t);return o});
+fl.connect(env);env.connect(dry);env.connect(wet);
+env.gain.setValueAtTime(0,t);env.gain.linearRampToValueAtTime(pk,t+sd.a);env.gain.setTargetAtTime(pk*sd.s,t+sd.a,sd.d/3);
+return()=>{const u=ac.currentTime;env.gain.cancelScheduledValues(u);env.gain.setValueAtTime(env.gain.value,u);env.gain.setTargetAtTime(0,u,sd.r/3);os.forEach(o=>o.stop(u+sd.r*2+.1))}}
+function noteOn(n,vel=.8){if(!ac)return;noteOff(n,true);const arr=[];
+songs[cur].p[sec].forEach(l=>{if(l.m)return;if(l.z==="low"&&n>=60)return;if(l.z==="high"&&n<60)return;
+const nn=n+l.oct*12;if(nn<0||nn>127)return;arr.push(voice(SOUNDS[l.s],nn,vel,l.v/100,l.t))});held[n]=arr;sus.delete(n);mark(n,1)}
+function noteOff(n,force){if(!held[n])return;if(pedal&&!force){sus.add(n);return}held[n].forEach(f=>f());delete held[n];mark(n,0)}
+function pedalSet(on){pedal=on;if(!on){[...sus].forEach(n=>{sus.delete(n);noteOff(n,true)})}}
+function panic(){Object.keys(held).forEach(n=>noteOff(+n,true));sus.clear()}
+function mark(n,on){const e=document.querySelector('[data-n="'+n+'"]');if(e)e.classList.toggle("d",!!on)}
+// MIDI
+let midi=null;
+async function connect(){if(!navigator.requestMIDIAccess){$("mstat").textContent="MIDI not supported in this browser";alert("This browser doesn’t support MIDI. Try Chrome or Edge on a laptop or Android phone. You can still use the on‑screen keys.");return}
+try{midi=await navigator.requestMIDIAccess();midi.onstatechange=listDev;listDev()}catch(e){$("mstat").textContent="MIDI access blocked"}}
+function listDev(){const s=$("dev"),v=s.value;s.innerHTML='<option value="all">All MIDI inputs</option>';let c=0;
+midi.inputs.forEach(i=>{c++;const o=document.createElement("option");o.value=i.id;o.textContent=i.name;s.appendChild(o);i.onmidimessage=onMsg});
+if([...s.options].some(o=>o.value===v))s.value=v;$("dot").className="dot"+(c?" ok":"");$("mstat").textContent=c?c+" device"+(c>1?"s":"")+" connected":"No keyboard found – plug it in"}
+function onMsg(e){const sel=$("dev").value;if(sel!=="all"&&e.target.id!==sel)return;const[s,a,b]=e.data,t=s&0xf0;
+if(t===0x90&&b>0)noteOn(a,b/127);else if(t===0x80||t===0x90)noteOff(a);
+else if(t===0xb0&&a===64)pedalSet(b>=64);else if(t===0xc0&&a<6)pick(a);else if(t===0xb0&&(a===123||a===120))panic()}
+// UI
+function pick(i){sec=i;panic();render()}
+function render(){const S=songs[cur];
+$("song").innerHTML=songs.map((s,i)=>'<option value="'+i+'"'+(i===cur?" selected":"")+">"+s.name.replace(/</g,"&lt;")+"</option>").join("");
+$("secs").innerHTML=SECS.map((n,i)=>'<button class="sec'+(i===sec?" on":"")+'" style="'+(i===sec?"background:"+COL[i]:"border-color:"+COL[i])+'" data-s="'+i+'">'+n+"</button>").join("");
+$("layers").innerHTML=S.p[sec].map((l,i)=>'<div class="layer'+(l.m?" mute":"")+'"><div class="row"><select data-i="'+i+'" data-k="s" style="flex:1;min-width:140px">'+soundOpts(l.s)+'</select><button data-i="'+i+'" data-a="mute">'+(l.m?"🔇 Off":"🔊 On")+'</button><button class="x" data-i="'+i+'" data-a="del" title="Remove">✕</button></div>'+
+'<div class="row" style="margin-top:6px"><div class="fader"><label>Volume ('+l.v+'%)</label><input type="range" min="0" max="100" value="'+l.v+'" data-i="'+i+'" data-k="v"></div>'+
+'<div><label class="pill">Pitch</label><div class="row"><button data-i="'+i+'" data-a="od">−8va</button><span class="pill">'+(l.oct>0?"+":"")+l.oct+'</span><button data-i="'+i+'" data-a="ou">+8va</button></div></div>'+
+'<div><label class="pill">Plays on</label><br><select data-i="'+i+'" data-k="z"><option value="all"'+(l.z==="all"?" selected":"")+'>Whole keyboard</option><option value="low"'+(l.z==="low"?" selected":"")+'>Left half only</option><option value="high"'+(l.z==="high"?" selected":"")+">Right half only</option></select></div></div>"+tweakBar(l,i)+"</div>").join("")||'<p class="help">No sounds yet – add one!</p>';save()}
+document.addEventListener("click",e=>{const t=e.target.closest("button");if(!t)return;const S=songs[cur],ls=S.p[sec];
+if(t.dataset.s!==undefined)return pick(+t.dataset.s);
+if(t.dataset.a){const l=ls[+t.dataset.i];if(t.dataset.a==="mute")l.m=!l.m;if(t.dataset.a==="del"){ls.splice(+t.dataset.i,1);openT={}}if(t.dataset.a==="tw"){const kk=sec+"-"+t.dataset.i;openT[kk]=!openT[kk]}if(t.dataset.a==="rst")delete l.t;if(t.dataset.a==="od")l.oct=Math.max(-2,l.oct-1);if(t.dataset.a==="ou")l.oct=Math.min(2,l.oct+1);render()}});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.t){const l=songs[cur].p[sec][+t.dataset.i],k=t.dataset.t,v=fromX(k,+t.value);l.t=l.t||{};l.t[k]=v;t.previousElementSibling.querySelector("b").textContent=fmt(k,v);save();return}if(t.dataset.k){const l=songs[cur].p[sec][+t.dataset.i];if(t.dataset.k==="v"){l.v=+t.value;t.previousElementSibling.textContent="Volume ("+l.v+"%)";save()}else{l[t.dataset.k]=t.value;if(t.dataset.k==="s")delete l.t;render()}}});
+$("add").onclick=()=>{songs[cur].p[sec].push(L("piano"));render()};
+$("copy").onclick=()=>{if(sec>0){songs[cur].p[sec]=JSON.parse(JSON.stringify(songs[cur].p[sec-1]));render()}};
+$("song").onchange=e=>{cur=+e.target.value;sec=0;panic();render()};
+$("ns").onclick=()=>{const n=prompt("Song name?","New Song");if(n){songs.push(defSong(n));cur=songs.length-1;sec=0;render()}};
+$("rn").onclick=()=>{const n=prompt("New name?",songs[cur].name);if(n){songs[cur].name=n;render()}};
+$("ds").onclick=()=>{if(songs.length>1&&confirm("Delete “"+songs[cur].name+"”?")){songs.splice(cur,1);cur=0;render()}else if(songs.length<2)alert("Keep at least one song.")};
+$("mv").oninput=$("rv").oninput=setVol;$("panic").onclick=panic;$("conn").onclick=connect;
+$("go").onclick=()=>{initAudio();ac.resume();$("start").style.display="none"};
+$("ou").onclick=()=>{viewOct=Math.min(6,viewOct+1);keys()};$("od").onclick=()=>{viewOct=Math.max(1,viewOct-1);keys()};
+// keyboard
+function keys(){const k=$("kbd"),base=12*(viewOct+1),blk=[1,3,6,8,10];let h="";
+for(let o=0;o<3;o++)for(let i=0;i<7;i++){const semi=[0,2,4,5,7,9,11][i],n=base+o*12+semi,nx=blk.includes(semi+1)&&!(i===6);
+h+='<div class="wk" data-n="'+n+'">'+(nx?'<div class="bk" data-n="'+(n+1)+'"></div>':"")+"</div>"}
+k.innerHTML=h}
+let down={};
+$("kbd").addEventListener("pointerdown",e=>{const t=e.target.closest("[data-n]");if(!t)return;e.preventDefault();initAudio();ac.resume();const n=+t.dataset.n;down[e.pointerId]=n;noteOn(n,.8)});
+const up=e=>{if(down[e.pointerId]!==undefined){noteOff(down[e.pointerId]);delete down[e.pointerId]}};
+addEventListener("pointerup",up);addEventListener("pointercancel",up);
+const KM={a:0,w:1,s:2,e:3,d:4,f:5,t:6,g:7,y:8,h:9,u:10,j:11,k:12,l:14};
+addEventListener("keydown",e=>{if(e.repeat||e.target.matches("input,select,textarea")||e.metaKey||e.ctrlKey)return;const k=e.key.toLowerCase();if(k in KM&&ac){noteOn(12*(viewOct+1)+KM[k])}else if(k>="1"&&k<="6")pick(+k-1)});
+addEventListener("keyup",e=>{const k=e.key.toLowerCase();if(k in KM)noteOff(12*(viewOct+1)+KM[k])});
+function addSongs(txt){let j;try{j=JSON.parse(txt)}catch(e){alert("That doesn’t look like a StagePatch file.");return}
+const a=clean(j&&(j.songs||(j.name?[j]:null)));if(!a){alert("No songs found in that file.");return}
+const n=songs.length;songs=songs.concat(a);cur=n;sec=0;panic();render()}
+async function exportSongs(list,fn){const data=JSON.stringify({app:"StagePatch",v:2,songs:list},null,1);
+try{const d=window.claude&&await window.claude.use("downloads");if(d){await d.save({filename:fn.replace(/[\\/:*?"<>|]/g,"").trim()+".json",data});return}}catch(e){if(e&&e.code==="declined")return}
+if(window.top===window.self){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data],{type:"application/json"}));a.download=fn.replace(/[\\/:*?"<>|]/g,"").trim()+".json";document.body.appendChild(a);a.click();a.remove();return}
+$("box").value=data;$("boxw").hidden=false;alert("Downloads aren’t available here, so the song text is shown below the buttons. Copy it into a file called song.json.")}
+$("sv1").onclick=()=>exportSongs([songs[cur]],songs[cur].name||"song");
+$("svall").onclick=()=>exportSongs(songs,"StagePatch songs");
+$("ld").onclick=()=>$("file").click();
+$("file").onchange=async e=>{const f=e.target.files[0];if(f){addSongs(await f.text())}e.target.value=""};
+$("pl").onclick=()=>addSongs($("box").value);
+let openT={};
+const TWP=[["a","Attack – how slowly the note fades in",3],["d","Decay – how fast it dips after the first hit",4],["s","Sustain – how loud it stays while the key is down",1],["r","Release – how long it rings after you let go",4],["f","Cutoff – low is soft and dark, high is bright",0],["q","Resonance – adds a ringing edge at the cutoff",12]];
+function toX(k,v,mx){return Math.max(0,Math.min(100,k==="s"?v*100:k==="f"?100*Math.log(v/100)/Math.log(160):k==="q"?v/12*100:Math.sqrt(v/mx)*100))}
+function fromX(k,x){const m={a:3,d:4,r:4}[k];return k==="s"?x/100:k==="f"?100*Math.pow(160,x/100):k==="q"?x*.12:m*Math.pow(x/100,2)}
+function fmt(k,v){return k==="s"?Math.round(v*100)+"%":k==="f"?Math.round(v)+" Hz":k==="q"?(+v).toFixed(1):(+v).toFixed(2)+" s"}
+function tweakBar(l,i){let h='<div class="row" style="margin-top:6px"><button data-i="'+i+'" data-a="tw">🎛 Tweak this sound'+(l.t?" ●":"")+"</button></div>";
+if(!openT[sec+"-"+i])return h;const e=Object.assign({},SOUNDS[l.s],l.t||{});
+return h+'<div class="tw">'+TWP.map(p=>'<div class="fader" style="margin-bottom:4px"><label>'+p[1]+' <b>'+fmt(p[0],e[p[0]])+'</b></label><input type="range" min="0" max="100" value="'+Math.round(toX(p[0],e[p[0]],p[2]))+'" data-i="'+i+'" data-t="'+p[0]+'"></div>').join("")+'<button data-i="'+i+'" data-a="rst">↺ Back to original sound</button><p class="help" style="margin:6px 0 0">Play a key after moving a slider to hear it.</p></div>'}
+function show(v,h){document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on",x.id==="v-"+v));document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.go===v));scrollTo(0,0);if(h&&$(h)){$(h).open=true;$(h).scrollIntoView()}}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)show(b.dataset.go,b.dataset.h)});
+document.querySelectorAll(".card").forEach(c=>{const h=c.querySelector("h2");if(h&&h.textContent.trim().slice(0,4)==="Save")$("v-play").appendChild(c)});
+$("start").remove();
+["pointerdown","keydown"].forEach(ev=>addEventListener(ev,()=>{initAudio();ac.resume()},true));
+keys();render();
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script></body></html>
