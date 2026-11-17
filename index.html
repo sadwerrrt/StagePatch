@@ -48,6 +48,7 @@ details{border:1px solid var(--bd);border-radius:12px;padding:4px 12px;margin-bo
 <button class='big' data-go='help' data-h='h-connect'>🔌  How to connect my keyboard</button>
 <button class='big' data-go='help' data-h='h-patch'>🎼  How to build a song patch</button>
 <button class='big' data-go='help' data-h='h-tweak'>🎛  How to shape a sound</button>
+<button class='big' data-go='help' data-h='h-import'>🎙  How to import my own sound</button>
 <button class='big' data-go='help' data-h='h-save'>💾  How to save my songs</button>
 <p class='help' style='text-align:center'>100 free sounds · 6 song sections · MIDI keyboard ready</p></div>
 <div class='view' id='v-help'><h1 style='margin:4px 0 12px'>Help guide</h1>
@@ -58,6 +59,7 @@ details{border:1px solid var(--bd);border-radius:12px;padding:4px 12px;margin-bo
 <details id='h-tweak'><summary>5 · Shape a sound (attack, release, cutoff)</summary><p>Under any sound, press <b>🎛 Tweak this sound</b>. Move a slider, then play a key to hear it. A dot ● on the button means that sound has been changed. <b>Back to original sound</b> undoes it.</p><ul><li><b>Attack:</b> how slowly the note fades in. Low is instant (piano), high is a slow swell (strings, pads).</li><li><b>Decay:</b> how fast the note dips after the first hit.</li><li><b>Sustain:</b> how loud the note stays while you hold the key. Low makes plucky sounds, high makes organ-like sounds.</li><li><b>Release:</b> how long the sound rings after you let go. High gives a long tail.</li><li><b>Cutoff:</b> low is soft and dark, high is bright and sharp.</li><li><b>Resonance:</b> adds a ringing, whistling edge around the cutoff. Keep it low for a natural sound.</li></ul><p>Settings are saved separately for each sound in each section.</p></details>
 <details id='h-live'><summary>6 · Playing live</summary><ul><li>Tap a section button to switch patches. On a laptop you can also press <b>1–6</b>.</li><li>Your keyboard’s <b>Program Change</b> buttons 1–6 also switch the sections, and a sustain pedal works.</li><li><b>Master volume</b> and <b>Room / echo</b> are under <b>Overall</b>. <b>Stop all</b> clears any stuck note.</li></ul></details>
 <details id='h-save'><summary>7 · Save and load your songs</summary><ul><li>Your songs are kept on this device automatically.</li><li>For a backup file, go to <b>Play</b>, scroll to <b>Save &amp; load songs</b> and press <b>Save this song to a file</b> (or <b>Save all songs</b>). Confirm the download.</li><li>To bring songs back, or move them to another phone or laptop, press <b>Load a song file</b> and pick the file. The songs are added to your list.</li></ul></details>
+<details id='h-import'><summary>9 · Import your own sound</summary><p>You can add your own recordings, such as a piano note, a pad, a vocal “ooh” or a drum hit, and use them like any built-in sound.</p><p><b>Best file type: WAV</b> (16‑bit or 24‑bit, 44.1 or 48 kHz). MP3, OGG, M4A/AAC and FLAC also work, but WAV gives the cleanest result. Mono files are smaller than stereo.</p><ul><li><b>One note per file:</b> record or export a single clean note, ideally around C4 (middle C) and 1–10 seconds long. The app plays it higher or lower across the keyboard.</li><li>Trim silence from the start so the sound responds right away.</li><li>Keep files under 20 MB and recordings under 60 seconds.</li><li>Not supported: SoundFont (.sf2), SFZ, Kontakt or other multi‑sample packs.</li></ul><ol><li>Go to <b>Play</b> and find <b>Import your own sound</b>.</li><li>Press <b>Import a sound from my device</b> and pick the file.</li><li>Set <b>Recorded note</b> to the note you recorded (middle C if you are not sure). If it sounds out of tune, change this setting.</li><li>Turn on <b>Keep sounding while key is held</b> for long sounds like pads or strings. Leave it off for short sounds like drums or plucks.</li><li>Press <b>Preview</b> to hear it, then <b>Use in this section</b> to add it to the patch. It also appears under <b>My Sounds</b> in every sound list.</li><li>Attack, release, cutoff and the other sliders work on imported sounds too.</li></ol><p>Imported sounds stay on this device. Song files don’t contain them, so on another device import the same file again with the same file name and your songs will find it.</p></details>
 <details id='h-trouble'><summary>8 · Troubleshooting</summary><ul><li><b>No sound:</b> turn up the phone or laptop volume and the Master volume, and tap the screen once so the browser lets the page play audio.</li><li><b>Keyboard not found:</b> check the cable, switch the keyboard on, press Connect again, and use Chrome or Edge. Some keyboards need to be set to USB MIDI mode.</li><li><b>Stuck note:</b> press <b>Stop all</b>.</li><li><b>Delay:</b> close other apps and use a wired connection, not Bluetooth headphones.</li></ul></details></div>
 <div id='v-play' class='view'><div class="card"><h2>1 · Connect keyboard</h2>
 <div class="row"><button class="pri" id="conn">Connect MIDI keyboard</button><select id="dev" style="flex:1;min-width:160px"><option value="all">All MIDI inputs</option></select></div>
@@ -78,6 +80,7 @@ details{border:1px solid var(--bd);border-radius:12px;padding:4px 12px;margin-bo
 <div class="fader"><label>Room / echo</label><input type="range" id="rv" min="0" max="100" value="25"></div>
 <button id="panic">Stop all</button></div></div>
 
+<div class="card"><h2>Import your own sound</h2><p class="help" style="margin:0 0 8px">Best file type: <b>WAV</b> (one note, 1–10 seconds). MP3, OGG and M4A also work.</p><div class="row"><button class="pri" id="smpb">➕ Import a sound from my device</button></div><input type="file" id="smpf" accept="audio/*,.wav,.mp3,.ogg,.m4a,.aac,.flac" hidden><div id="mine" style="margin-top:8px"></div></div>
 <div class="card"><div class="row" style="margin-bottom:8px"><h2 style="margin:0">Keys</h2><button id="ou">View octave ▶</button><button id="od">◀ View octave</button></div><div id="kbd"></div></div>
 
 </div><div class="card" hidden><h2>How to connect</h2><ul class="help">
@@ -122,9 +125,9 @@ mk("pluck","Pluck",{o:[[W,1,1],[Q,2,.3]],a:.003,d:.35,s:.02,r:.2,f:2600},[
 ["Pluck",{}],["Harp",{o:[[T,1,1],["sine",2,.3],["sine",3,.1]],d:1.2,f:5000}],["Guitar Pluck",{o:[[W,1,1],[T,2,.3]],f:2000,d:.6}],["Kalimba",{o:[["sine",1,1],["sine",5.4,.3]],d:.9,f:6000}],["Pizzicato",{d:.15,f:2200}],["Marimba",{o:[["sine",1,1],["sine",4,.4]],d:.5}],["Koto",{o:[[W,1,1],[T,2,.4]],f:3500,d:.8}],["Banjo",{o:[[Q,1,1],[W,2,.5]],f:3500,d:.3}],["Synth Pluck",{o:[[W,1,1,-8],[W,1,1,8]],f:3500,d:.25}],["Harpsichord",{o:[[Q,1,.6],[W,2,.5]],f:5000,d:.5,s:0,r:.1}]]);
 mk("bell","Bells",{o:[["sine",1,1],["sine",2.76,.4],["sine",5.4,.2]],a:.003,d:2.5,s:0,r:.8,f:9000},[
 ["Bells",{}],["Glockenspiel",{o:[["sine",1,1],["sine",4,.5],["sine",8,.2]],d:1.5,f:12000}],["Music Box",{o:[["sine",1,1],["sine",3,.3],["sine",6,.15]],d:1.2}],["Tubular Bells",{o:[["sine",1,1],["sine",2.76,.6],["sine",5.4,.4],["sine",8.9,.2]],d:3.5}],["Vibraphone",{o:[["sine",1,1],["sine",4,.2]],d:2.2}],["Crystal",{o:[["sine",1,1],["sine",3.9,.4],["sine",6.2,.3]],d:2.8,f:12000}],["Chime",{o:[["sine",1,1],["sine",2.4,.4]],d:3,r:1.2}],["Celesta",{o:[["sine",1,1],["sine",4,.3]],d:1.4}],["Church Bell",{o:[["sine",1,1],["sine",2.4,.7],["sine",3,.4],["sine",4.5,.3]],d:4}],["Dream Bells",{a:.1,d:3,r:2}]]);
-function soundOpts(cur){return Object.keys(CATS).map(c=>'<optgroup label="'+CATS[c]+'">'+Object.keys(SOUNDS).filter(k=>SOUNDS[k].c===c).map(k=>'<option value="'+k+'"'+(k===cur?" selected":"")+">"+SOUNDS[k].n+"</option>").join("")+"</optgroup>").join("")}
+function soundOpts(cur){return Object.keys(CATS).filter(c=>Object.keys(SOUNDS).some(k=>SOUNDS[k].c===c)).map(c=>'<optgroup label="'+CATS[c]+'">'+Object.keys(SOUNDS).filter(k=>SOUNDS[k].c===c).map(k=>'<option value="'+k+'"'+(k===cur?" selected":"")+">"+SOUNDS[k].n+"</option>").join("")+"</optgroup>").join("")+(/^smp_/.test(cur)&&!SOUNDS[cur]?'<option value="'+cur+'" selected>(sound missing – re-import it)</option>':"")}
 function ct(t){if(!t||typeof t!=="object")return undefined;const o={};[["a",0,3],["d",.01,4],["s",0,1],["r",.01,4],["f",100,16000],["q",.1,20]].forEach(([k,lo,hi])=>{if(t[k]!=null&&isFinite(+t[k]))o[k]=Math.max(lo,Math.min(hi,+t[k]))});return Object.keys(o).length?o:undefined}
-function clean(a){if(!Array.isArray(a))return null;const out=[];a.forEach(s=>{if(!s||typeof s.name!=="string"||!Array.isArray(s.p))return;const p=[];for(let i=0;i<6;i++){const ls=Array.isArray(s.p[i])?s.p[i].filter(Boolean):[];p.push(ls.slice(0,8).map(l=>{let k=String(l.s);if(!SOUNDS[k])k=SOUNDS[k+"0"]?k+"0":"piano0";return{s:k,v:Math.max(0,Math.min(100,l.v==null?80:+l.v||0)),oct:Math.max(-2,Math.min(2,Math.round(+l.oct||0))),z:["all","low","high"].includes(l.z)?l.z:"all",m:!!l.m,t:ct(l.t)}}))}out.push({name:s.name.slice(0,60),p})});return out.length?out:null}
+function clean(a){if(!Array.isArray(a))return null;const out=[];a.forEach(s=>{if(!s||typeof s.name!=="string"||!Array.isArray(s.p))return;const p=[];for(let i=0;i<6;i++){const ls=Array.isArray(s.p[i])?s.p[i].filter(Boolean):[];p.push(ls.slice(0,8).map(l=>{let k=String(l.s);if(!SOUNDS[k]&&!/^smp_/.test(k))k=SOUNDS[k+"0"]?k+"0":"piano0";return{s:k,v:Math.max(0,Math.min(100,l.v==null?80:+l.v||0)),oct:Math.max(-2,Math.min(2,Math.round(+l.oct||0))),z:["all","low","high"].includes(l.z)?l.z:"all",m:!!l.m,t:ct(l.t)}}))}out.push({name:s.name.slice(0,60),p})});return out.length?out:null}
 const SECS=["Intro","Verse","Pre-Chorus","Chorus","Instrumental","Bridge"];
 const COL=["#e0568a","#2e9bd6","#e49a1f","#d9473d","#2fa86b","#8a5cd6"];
 const L=(s,v=80,oct=0,z="all")=>({s:s+"0",v,oct,z,m:false});
@@ -148,7 +151,7 @@ env.gain.setValueAtTime(0,t);env.gain.linearRampToValueAtTime(pk,t+sd.a);env.gai
 return()=>{const u=ac.currentTime;env.gain.cancelScheduledValues(u);env.gain.setValueAtTime(env.gain.value,u);env.gain.setTargetAtTime(0,u,sd.r/3);os.forEach(o=>o.stop(u+sd.r*2+.1))}}
 function noteOn(n,vel=.8){if(!ac)return;noteOff(n,true);const arr=[];
 songs[cur].p[sec].forEach(l=>{if(l.m)return;if(l.z==="low"&&n>=60)return;if(l.z==="high"&&n<60)return;
-const nn=n+l.oct*12;if(nn<0||nn>127)return;arr.push(voice(SOUNDS[l.s],nn,vel,l.v/100,l.t))});held[n]=arr;sus.delete(n);mark(n,1)}
+const nn=n+l.oct*12;if(nn<0||nn>127)return;const sd=SOUNDS[l.s];if(!sd)return;const fn=sd.smp?sampleVoice(sd,nn,vel,l.v/100,l.t):voice(sd,nn,vel,l.v/100,l.t);if(fn)arr.push(fn)});held[n]=arr;sus.delete(n);mark(n,1)}
 function noteOff(n,force){if(!held[n])return;if(pedal&&!force){sus.add(n);return}held[n].forEach(f=>f());delete held[n];mark(n,0)}
 function pedalSet(on){pedal=on;if(!on){[...sus].forEach(n=>{sus.delete(n);noteOff(n,true)})}}
 function panic(){Object.keys(held).forEach(n=>noteOff(+n,true));sus.clear()}
@@ -221,7 +224,37 @@ function show(v,h){document.querySelectorAll(".view").forEach(x=>x.classList.tog
 document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)show(b.dataset.go,b.dataset.h)});
 document.querySelectorAll(".card").forEach(c=>{const h=c.querySelector("h2");if(h&&h.textContent.trim().slice(0,4)==="Save")$("v-play").appendChild(c)});
 $("start").remove();
-["pointerdown","keydown"].forEach(ev=>addEventListener(ev,()=>{initAudio();ac.resume()},true));
-keys();render();
+["pointerdown","keydown"].forEach(ev=>addEventListener(ev,()=>{initAudio();ac.resume();decodeAll()},true));
+const SAMPLES={};let db;
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function idb(){return new Promise((res,rej)=>{if(db)return res(db);const r=indexedDB.open("stagepatch",1);r.onupgradeneeded=()=>r.result.createObjectStore("s",{keyPath:"id"});r.onsuccess=()=>{db=r.result;res(db)};r.onerror=()=>rej(r.error)})}
+async function dbAll(){try{const d=await idb();return await new Promise((res,rej)=>{const q=d.transaction("s").objectStore("s").getAll();q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){return[]}}
+async function dbPut(s){try{const d=await idb();d.transaction("s","readwrite").objectStore("s").put({id:s.id,name:s.name,root:s.root,loop:s.loop,data:s.data})}catch(e){}}
+async function dbDel(id){try{const d=await idb();d.transaction("s","readwrite").objectStore("s").delete(id)}catch(e){}}
+function addSample(r){SAMPLES[r.id]=r;CATS.mine="My Sounds";SOUNDS["smp_"+r.id]={n:r.name,c:"mine",smp:1,sid:r.id,a:.005,d:.2,s:1,r:.3,f:16000,q:.7}}
+async function decodeAll(){if(!ac)return;for(const id in SAMPLES){const s=SAMPLES[id];if(!s.buf&&!s.dec){s.dec=1;try{s.buf=await ac.decodeAudioData(s.data.slice(0))}catch(e){s.bad=1}}}}
+function sampleVoice(sd0,note,vel,lv,tw){const sd=tw?Object.assign({},sd0,tw):sd0,s=SAMPLES[sd0.sid];if(!s||!s.buf)return null;const t=ac.currentTime,src=ac.createBufferSource(),fl=ac.createBiquadFilter(),env=ac.createGain(),pk=.5*vel*lv;
+src.buffer=s.buf;src.playbackRate.value=Math.pow(2,(note-s.root)/12);if(s.loop)src.loop=true;
+fl.type="lowpass";fl.frequency.value=Math.min(sd.f,20000);fl.Q.value=sd.q||.7;src.connect(fl);fl.connect(env);env.connect(dry);env.connect(wet);src.start(t);
+env.gain.setValueAtTime(0,t);env.gain.linearRampToValueAtTime(pk,t+Math.max(sd.a,.003));env.gain.setTargetAtTime(pk*sd.s,t+sd.a,sd.d/3);
+return()=>{const u=ac.currentTime;env.gain.cancelScheduledValues(u);env.gain.setValueAtTime(env.gain.value,u);env.gain.setTargetAtTime(0,u,sd.r/3);try{src.stop(u+sd.r*2+.1)}catch(e){}}}
+function noteOpts(cur){let h="";for(let n=36;n<=96;n++)h+='<option value="'+n+'"'+(n===cur?" selected":"")+">"+["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"][n%12]+(Math.floor(n/12)-1)+(n===60?" (middle C)":"")+"</option>";return h}
+function renderMine(){const ids=Object.keys(SAMPLES);$("mine").innerHTML=ids.length?ids.map(id=>{const s=SAMPLES[id];return '<div class="layer"><div class="row"><input type="text" value="'+esc(s.name)+'" data-sm="'+id+'" data-f="name" style="flex:1;min-width:120px"><button class="x" data-sm="'+id+'" data-act="del" title="Delete">✕</button></div><div class="row" style="margin-top:6px"><div><label class="pill">Recorded note</label><br><select data-sm="'+id+'" data-f="root">'+noteOpts(s.root)+'</select></div><label class="pill" style="display:flex;gap:6px;align-items:center;min-height:44px"><input type="checkbox" data-sm="'+id+'" data-f="loop"'+(s.loop?" checked":"")+'> Keep sounding while key is held</label></div><div class="row" style="margin-top:6px"><button data-sm="'+id+'" data-act="pv">▶ Preview</button><button class="pri" data-sm="'+id+'" data-act="use">Use in this section</button></div></div>'}).join(""):'<p class="help" style="margin:0">Nothing imported yet.</p>'}
+$("smpb").onclick=()=>$("smpf").click();
+$("smpf").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;
+if(f.size>20*1024*1024){alert("That file is bigger than 20 MB. Please use a smaller file.");return}
+initAudio();ac.resume();const data=await f.arrayBuffer();let buf;
+try{buf=await ac.decodeAudioData(data.slice(0))}catch(err){alert("This browser couldn’t read that file. Please use WAV, MP3, OGG or M4A.");return}
+if(buf.duration>60){alert("Please use a recording shorter than 60 seconds.");return}
+const name=f.name.replace(/\.[^.]+$/,"").slice(0,40)||"My sound",id=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")||"sound";
+if(SAMPLES[id]&&!confirm("A sound with this name already exists. Replace it?"))return;
+const rec={id,name,root:60,loop:false,data,buf};addSample(rec);await dbPut(rec);render();renderMine()};
+document.addEventListener("click",async e=>{const t=e.target.closest("button[data-act]"),id=t&&t.dataset.sm;if(!id||!SAMPLES[id])return;const k="smp_"+id;
+if(t.dataset.act==="pv"){initAudio();ac.resume();await decodeAll();const fn=sampleVoice(SOUNDS[k],SAMPLES[id].root,.8,1);if(fn)setTimeout(fn,2500)}
+if(t.dataset.act==="use"){songs[cur].p[sec].push({s:k,v:80,oct:0,z:"all",m:false});render()}
+if(t.dataset.act==="del"&&confirm("Delete this sound? It is also removed from your patches.")){delete SAMPLES[id];delete SOUNDS[k];songs.forEach(s=>s.p=s.p.map(ls=>ls.filter(l=>l.s!==k)));await dbDel(id);save();render();renderMine()}});
+document.addEventListener("change",async e=>{const t=e.target,id=t.dataset.sm,f=t.dataset.f;if(!id||!f||!SAMPLES[id])return;const s=SAMPLES[id];
+if(f==="name"){s.name=t.value.trim().slice(0,40)||s.name;SOUNDS["smp_"+id].n=s.name}if(f==="root")s.root=+t.value;if(f==="loop")s.loop=t.checked;await dbPut(s);render();renderMine()});
+keys();render();renderMine();dbAll().then(rs=>{rs.forEach(addSample);render();renderMine();decodeAll()});
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script></body></html>
