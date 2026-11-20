@@ -1,4 +1,4 @@
-SADWERT v2.2 - app files for building an Android APK
+SADWERT v2.3 - app files for building an Android APK
 =====================================================
 
 Files (keep index.html at the top level, not inside a sub-folder):
@@ -25,9 +25,14 @@ OPTION 2 - Capacitor + Android Studio (free, full control)
        npx cap open android
   5. In Android Studio choose Build > Build Bundle(s) / APK(s) > Build APK(s).
 
-OPTION 3 - GitHub Pages + PWABuilder
-  Put these files in your GitHub repo, turn on GitHub Pages, then paste the
-  https address into pwabuilder.com and download the Android package.
+OPTION 3 - Host it, then PWABuilder (pwabuilder.com)
+  PWABuilder checks a LIVE https address, so the files must be online first.
+  1. Upload ALL files in this zip to the top level of a GitHub repo
+     (or drag the unzipped folder onto app.netlify.com/drop).
+  2. GitHub: Settings > Pages > Deploy from branch > main / (root).
+  3. Open the address it gives you and check the app loads.
+  4. Paste that address into pwabuilder.com. The manifest and service
+     worker will be found. Choose Android, then download the package.
 
 GOOD TO KNOW
   - Songs, settings and imported sounds are saved inside the app on the phone.
